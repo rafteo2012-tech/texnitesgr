@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
@@ -35,26 +37,27 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md text-center">
-          <div className="text-5xl mb-4">✉️</div>
-          <h2 className="text-xl font-bold mb-2">Έλεγξε το email σου!</h2>
-          <p className="text-gray-500 text-sm">Στείλαμε σύνδεσμο επιβεβαίωσης στο <strong>{form.email}</strong>. Κάνε κλικ για να ενεργοποιήσεις τον λογαριασμό σου.</p>
-          <Link href="/login" className="mt-6 inline-block text-blue-600 font-semibold hover:underline text-sm">Πήγαινε στη σύνδεση</Link>
+      <main className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex items-center justify-center px-4 py-32">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md text-center">
+            <div className="text-5xl mb-4">✉️</div>
+            <h2 className="text-xl font-bold mb-2">Έλεγξε το email σου!</h2>
+            <p className="text-gray-500 text-sm">Στείλαμε σύνδεσμο επιβεβαίωσης στο <strong>{form.email}</strong>. Κάνε κλικ για να ενεργοποιήσεις τον λογαριασμό σου.</p>
+            <Link href="/login" className="mt-6 inline-block text-blue-600 font-semibold hover:underline text-sm">Πήγαινε στη σύνδεση</Link>
+          </div>
         </div>
-      </div>
+        <Footer />
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <main className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="flex items-center justify-center px-4 py-12">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-extrabold text-blue-600">
-            Texnites<span className="text-gray-900">GR</span>
-          </Link>
-          <h1 className="text-xl font-bold mt-4 text-gray-900">Δημιουργία λογαριασμού</h1>
-        </div>
+        <h1 className="text-xl font-bold text-center text-gray-900 mb-8">Δημιουργία λογαριασμού</h1>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-6">
@@ -96,6 +99,8 @@ export default function RegisterPage() {
           <Link href="/register-technician" className="text-blue-600 font-semibold hover:underline">Εγγραφή τεχνικού</Link>
         </p>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </main>
   )
 }

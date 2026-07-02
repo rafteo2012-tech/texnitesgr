@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -19,6 +19,21 @@ const categories = [
 ]
 
 export default function RequestServicePage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex items-center justify-center py-32">
+          <div className="animate-pulse text-gray-400">Φόρτωση...</div>
+        </div>
+      </main>
+    }>
+      <RequestServiceForm />
+    </Suspense>
+  )
+}
+
+function RequestServiceForm() {
   const searchParams = useSearchParams()
   const technicianId = searchParams.get('technician')
 
@@ -31,6 +46,19 @@ export default function RequestServicePage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const supabase = createClient()
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user && !technicianId) {
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+        if (profile) {
+          setForm(f => ({ ...f, contact_name: profile.full_name || '', contact_email: user.email || '' }))
+        }
+      }
+    }
+    loadProfile()
+  }, [])
 
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
 

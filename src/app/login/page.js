@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
@@ -26,14 +28,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <main className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="flex items-center justify-center px-4 py-12">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-extrabold text-blue-600">
-            Texnites<span className="text-gray-900">GR</span>
-          </Link>
-          <h1 className="text-xl font-bold mt-4 text-gray-900">Σύνδεση στον λογαριασμό σου</h1>
-        </div>
+        <h1 className="text-xl font-bold text-center text-gray-900 mb-8">Σύνδεση στον λογαριασμό σου</h1>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-6">
@@ -78,6 +77,8 @@ export default function LoginPage() {
           <Link href="/register" className="text-blue-600 font-semibold hover:underline">Εγγραφή</Link>
         </p>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </main>
   )
 }

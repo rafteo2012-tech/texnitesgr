@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
@@ -21,6 +21,21 @@ const categories = [
 ]
 
 export default function TechniciansPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex items-center justify-center py-32">
+          <div className="animate-pulse text-gray-400">Φόρτωση...</div>
+        </div>
+      </main>
+    }>
+      <TechniciansContent />
+    </Suspense>
+  )
+}
+
+function TechniciansContent() {
   const searchParams = useSearchParams()
   const [technicians, setTechnicians] = useState([])
   const [loading, setLoading] = useState(true)

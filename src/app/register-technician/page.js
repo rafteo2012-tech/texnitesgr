@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/client'
 
 const categories = [
@@ -58,7 +60,17 @@ export default function RegisterTechnicianPage() {
     }
 
     // 2. Ενημέρωση profile με τηλέφωνο
-    await supabase.from('profiles').update({ phone: form.phone }).eq('id', authData.user.id)
+    const { error: profileError } = await supabase.from('profiles').upsert({
+      id: authData.user.id,
+      phone: form.phone,
+      full_name: form.full_name,
+      role: 'technician',
+    })
+    if (profileError) {
+      setError('Σφάλμα ενημέρωσης προφίλ: ' + profileError.message)
+      setLoading(false)
+      return
+    }
 
     // 3. Δημιουργία technician profile
     const { error: techError } = await supabase.from('technicians').insert({
@@ -82,29 +94,30 @@ export default function RegisterTechnicianPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md text-center">
-          <div className="text-5xl mb-4">🎉</div>
-          <h2 className="text-xl font-bold mb-2">Καλώς ήρθες στο TexnitesGR!</h2>
-          <p className="text-gray-500 text-sm mb-6">Επιβεβαίωσε το email σου και το προφίλ σου θα εμφανιστεί στην πλατφόρμα.</p>
-          <Link href="/login" className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-            Σύνδεση
-          </Link>
+      <main className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="flex items-center justify-center px-4 py-24">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-md text-center">
+            <div className="text-5xl mb-4">🎉</div>
+            <h2 className="text-xl font-bold mb-2">Καλώς ήρθες στο TexnitesGR!</h2>
+            <p className="text-gray-500 text-sm mb-6">Επιβεβαίωσε το email σου και το προφίλ σου θα εμφανιστεί στην πλατφόρμα.</p>
+            <Link href="/login" className="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+              Σύνδεση
+            </Link>
+          </div>
         </div>
-      </div>
+        <Footer />
+      </main>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <main className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="py-12 px-4">
       <div className="max-w-lg mx-auto">
-        <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-extrabold text-blue-600">
-            Texnites<span className="text-gray-900">GR</span>
-          </Link>
-          <h1 className="text-xl font-bold mt-4">Εγγραφή Τεχνικού</h1>
-          <p className="text-gray-500 text-sm mt-1">Δημιούργησε το επαγγελματικό σου προφίλ</p>
-        </div>
+        <h1 className="text-xl font-bold text-center">Εγγραφή Τεχνικού</h1>
+        <p className="text-gray-500 text-sm text-center mt-1">Δημιούργησε το επαγγελματικό σου προφίλ</p>
 
         {/* Steps */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -218,6 +231,8 @@ export default function RegisterTechnicianPage() {
           <Link href="/login" className="text-blue-600 font-semibold hover:underline">Σύνδεση</Link>
         </p>
       </div>
-    </div>
+      </div>
+      <Footer />
+    </main>
   )
 }
