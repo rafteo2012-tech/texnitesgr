@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -14,9 +14,11 @@ export default function AdminPage() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
-  const supabase = createClient()
+  const supabaseRef = useRef(null)
 
   useEffect(() => {
+    supabaseRef.current = createClient()
+    const supabase = supabaseRef.current
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = '/login'; return }
@@ -38,31 +40,32 @@ export default function AdminPage() {
     load()
   }, [])
 
+  const db = () => supabaseRef.current
   const loadTabData = async (t) => {
     if (t === 'technicians') {
-      const { data } = await supabase.from('technicians').select('*, profiles(full_name, email, phone)').order('created_at', { ascending: false })
+      const { data } = await db().from('technicians').select('*, profiles(full_name, email, phone)').order('created_at', { ascending: false })
       setTechnicians(data || [])
     } else if (t === 'requests') {
-      const { data } = await supabase.from('service_requests').select('*').order('created_at', { ascending: false })
+      const { data } = await db().from('service_requests').select('*').order('created_at', { ascending: false })
       setRequests(data || [])
     } else if (t === 'bookings') {
-      const { data } = await supabase.from('bookings').select('*, profiles(full_name), technicians(business_name, profiles(full_name))').order('created_at', { ascending: false })
+      const { data } = await db().from('bookings').select('*, profiles(full_name), technicians(business_name, profiles(full_name))').order('created_at', { ascending: false })
       setBookings(data || [])
     }
   }
 
   const toggleTechnicianStatus = async (id, current) => {
-    await supabase.from('technicians').update({ is_active: !current }).eq('id', id)
+    await db().from('technicians').update({ is_active: !current }).eq('id', id)
     setTechnicians(prev => prev.map(t => t.id === id ? { ...t, is_active: !current } : t))
   }
 
   const toggleVerified = async (id, current) => {
-    await supabase.from('technicians').update({ is_verified: !current }).eq('id', id)
+    await db().from('technicians').update({ is_verified: !current }).eq('id', id)
     setTechnicians(prev => prev.map(t => t.id === id ? { ...t, is_verified: !current } : t))
   }
 
   const toggleFeatured = async (id, current) => {
-    await supabase.from('technicians').update({ is_featured: !current }).eq('id', id)
+    await db().from('technicians').update({ is_featured: !current }).eq('id', id)
     setTechnicians(prev => prev.map(t => t.id === id ? { ...t, is_featured: !current } : t))
   }
 
