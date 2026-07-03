@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
@@ -19,9 +19,11 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState([])
   const [reviews, setReviews] = useState({})
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const supabaseRef = useRef(null)
 
   useEffect(() => {
+    supabaseRef.current = createClient()
+    const supabase = supabaseRef.current
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = '/login'; return }
@@ -69,12 +71,12 @@ export default function DashboardPage() {
   }, [])
 
   const updateBookingStatus = async (id, status) => {
-    await supabase.from('bookings').update({ status }).eq('id', id)
+    await supabaseRef.current.from('bookings').update({ status }).eq('id', id)
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b))
   }
 
   const submitReview = async (bookingId, technicianId, rating, comment) => {
-    const { error } = await supabase.from('reviews').insert({
+    const { error } = await supabaseRef.current.from('reviews').insert({
       booking_id: bookingId,
       customer_id: user.id,
       technician_id: technicianId,
