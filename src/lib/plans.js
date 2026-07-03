@@ -1,0 +1,46 @@
+export const PLANS = {
+  free: {
+    key: 'free',
+    label: 'Free',
+    price: 0,
+    priceLabel: 'Δωρεάν',
+    description: 'Βασική προβολή στην πλατφόρμα',
+    features: [
+      'Προφίλ τεχνικού',
+      'Λήψη αιτημάτων',
+      'Βασική σειρά εμφάνισης',
+    ],
+    popular: false,
+  },
+  pro: {
+    key: 'pro',
+    label: 'Pro',
+    price: 1999,
+    priceLabel: '€19.99',
+    period: '/μήνα',
+    description: 'Αυξημένη προβολή και αξιοπιστία',
+    features: [
+      'Όλα τα Free',
+      'Προτεραιότητα στην αναζήτηση',
+      'Σήμα επαλήθευσης',
+      'Προβολή ως "Pro"',
+    ],
+    popular: true,
+  },
+  premium: {
+    key: 'premium',
+    label: 'Premium',
+    price: 4999,
+    priceLabel: '€49.99',
+    period: '/μήνα',
+    description: 'Μέγιστη προβολή και προτεραιότητα',
+    features: [
+      'Όλα τα Pro',
+      'Top θέση στα αποτελέσματα',
+      'Προτεραιότητα υποστήριξη',
+      'Premium σήμα',
+      'Περισσότερες φωτογραφίες',
+    ],
+    popular: false,
+  },
+}

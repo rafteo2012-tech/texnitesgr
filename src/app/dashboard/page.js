@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/client'
+import { PLANS } from '@/lib/plans'
 
 const statusLabel = {
   pending: { label: 'Αναμονή', color: 'bg-yellow-100 text-yellow-700' },
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const [bookings, setBookings] = useState([])
   const [reviews, setReviews] = useState({})
   const [loading, setLoading] = useState(true)
+  const [portalLoading, setPortalLoading] = useState(false)
   const supabaseRef = useRef(null)
 
   useEffect(() => {
@@ -73,6 +75,14 @@ export default function DashboardPage() {
   const updateBookingStatus = async (id, status) => {
     await supabaseRef.current.from('bookings').update({ status }).eq('id', id)
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b))
+  }
+
+  const openPortal = async () => {
+    setPortalLoading(true)
+    const res = await fetch('/api/stripe/portal', { method: 'POST' })
+    const data = await res.json()
+    if (data.url) window.location.href = data.url
+    setPortalLoading(false)
   }
 
   const submitReview = async (bookingId, technicianId, rating, comment) => {
@@ -160,6 +170,45 @@ export default function DashboardPage() {
                 <div className="text-sm text-gray-500 mt-1">{s.label}</div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Subscription */}
+        {isTechnician && techProfile && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Συνδρομή</h2>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md capitalize ${
+                techProfile.subscription_plan === 'premium' ? 'bg-purple-100 text-purple-700'
+                : techProfile.subscription_plan === 'pro' ? 'bg-blue-100 text-blue-700'
+                : 'bg-gray-100 text-gray-600'
+              }`}>
+                {techProfile.subscription_plan}
+              </span>
+            </div>
+            <div className="text-sm text-gray-500 mb-4">
+              {techProfile.subscription_plan === 'free'
+                ? 'Είσαι στο δωρεάν πρόγραμμα. Αναβαθμίσου για περισσότερη προβολή.'
+                : `Είσαι στο ${PLANS[techProfile.subscription_plan]?.label} πρόγραμμα.`
+              }
+            </div>
+            <div className="flex gap-3">
+              {techProfile.subscription_plan === 'free' ? (
+                <Link href="/pricing" className="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  Αναβαθμίσου
+                </Link>
+              ) : (
+                <button onClick={openPortal} disabled={portalLoading}
+                  className="border border-gray-200 text-gray-700 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-60">
+                  {portalLoading ? 'Φόρτωση...' : 'Διαχείριση Συνδρομής'}
+                </button>
+              )}
+              {techProfile.subscription_plan !== 'free' && (
+                <Link href="/pricing" className="text-sm text-blue-600 font-semibold py-2 hover:underline">
+                  Αλλαγή Πλάνου
+                </Link>
+              )}
+            </div>
           </div>
         )}
 
